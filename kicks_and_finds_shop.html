@@ -1,0 +1,355 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: #f7f4f0; min-height: 100vh; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-thumb { background: #c8a96e; border-radius: 3px; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(18px);} to {opacity:1;transform:translateY(0);} }
+  @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.6} }
+  
+  header { background:#1a1a1a; position:sticky;top:0;z-index:100; box-shadow:0 2px 20px rgba(0,0,0,0.22); }
+  .header-inner { max-width:1100px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:64px; }
+  .logo { display:flex;align-items:center;gap:10px; }
+  .logo-icon { font-size:22px; }
+  .logo-title { font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.02em; }
+  .logo-title span { color:#c8a96e; }
+  .logo-sub { font-size:10px;color:#777;letter-spacing:0.14em;text-transform:uppercase;margin-top:-2px; }
+  .admin-btn { border-radius:8px;padding:7px 16px;cursor:pointer;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;transition:all 0.2s;border:1.5px solid #444;background:transparent;color:#888; }
+  .admin-btn.active { background:#c8a96e;color:#1a1a1a;border-color:#c8a96e; }
+  
+  .hero-strip { background:linear-gradient(135deg,#1a1a1a 0%,#2d2420 100%);padding:16px 20px;text-align:center; }
+  .hero-strip p { color:#c8a96e;font-size:12.5px;letter-spacing:0.18em;text-transform:uppercase; }
+
+  .controls { max-width:1100px;margin:0 auto;padding:24px 20px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center; }
+  .search-wrap { flex:1;min-width:200px;position:relative; }
+  .search-wrap input { width:100%;padding:11px 14px 11px 38px;border:1.5px solid #e8e4df;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;background:#fff;outline:none;transition:border-color 0.2s; }
+  .search-wrap input:focus { border-color:#c8a96e; }
+  .search-icon { position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#bbb;font-size:15px;pointer-events:none; }
+  .pills { display:flex;gap:7px;flex-wrap:wrap; }
+  .pill { padding:8px 16px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:12.5px;transition:all 0.18s;border:1.5px solid #e0dbd4;background:#fff;color:#777; }
+  .pill.active { background:#c8a96e;color:#1a1a1a;border-color:#c8a96e; }
+  .admin-notice { max-width:1100px;margin:12px auto 0;padding:0 20px; }
+  .admin-notice-inner { background:#fff8ec;border:1.5px dashed #c8a96e;border-radius:10px;padding:10px 16px;font-size:13px;color:#9a6f28;font-weight:600; }
+
+  main { max-width:1100px;margin:0 auto;padding:24px 20px 60px; }
+  .grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:22px; }
+  
+  .card { background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.07);display:flex;flex-direction:column;transition:box-shadow 0.22s,transform 0.22s;animation:fadeUp 0.4s ease both; }
+  .card:hover { box-shadow:0 10px 36px rgba(0,0,0,0.13);transform:translateY(-3px); }
+  
+  .img-wrap { position:relative;width:100%;padding-bottom:125%;background:#f0ede8;overflow:hidden; }
+  .img-wrap img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease; }
+  .card:hover .img-wrap img { transform:scale(1.04); }
+  .sold-overlay { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.35); }
+  .sold-badge { background:#c0392b;color:#fff;font-weight:700;font-size:12px;letter-spacing:0.15em;padding:5px 16px;text-transform:uppercase;border-radius:3px; }
+  .cond-badge { position:absolute;top:11px;left:11px;background:rgba(255,255,255,0.93);backdrop-filter:blur(4px);border-radius:20px;padding:3px 9px;font-size:11px;font-weight:600;color:#333;letter-spacing:0.04em; }
+  .like-btn { position:absolute;top:11px;right:11px;background:rgba(255,255,255,0.92);backdrop-filter:blur(4px);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-size:15px;transition:transform 0.15s; }
+  .like-btn:hover { transform:scale(1.18); }
+  .dots { position:absolute;bottom:9px;left:50%;transform:translateX(-50%);display:flex;gap:4px; }
+  .dot { height:5px;border-radius:3px;background:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.18s;border:none; }
+  .dot.active { background:#fff;width:16px!important; }
+  
+  .card-body { padding:15px 17px 18px;flex:1;display:flex;flex-direction:column;gap:9px; }
+  .card-meta { display:flex;justify-content:space-between;align-items:center; }
+  .brand { font-size:11px;font-weight:700;color:#c8a96e;text-transform:uppercase;letter-spacing:0.12em; }
+  .time-ago { font-size:11px;color:#bbb;display:flex;align-items:center;gap:3px; }
+  .card-name { font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:#1a1a1a;line-height:1.35; }
+  .card-desc { font-size:12.5px;color:#888;line-height:1.6; }
+  .avail { display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600; }
+  .avail.yes { color:#2d6a4f; }
+  .avail.no { color:#c0392b; }
+  .price-row { display:flex;align-items:center;gap:8px;margin-top:2px; }
+  .price { font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#1a1a1a; }
+  .edit-price-btn { background:none;border:1px dashed #c8a96e;border-radius:5px;padding:3px 7px;cursor:pointer;color:#c8a96e;font-size:12px;transition:background 0.15s; }
+  .edit-price-btn:hover { background:#fff8ec; }
+  .price-edit-row { display:flex;align-items:center;gap:6px; }
+  .price-input { width:90px;padding:4px 8px;border:2px solid #c8a96e;border-radius:6px;font-size:16px;font-weight:700;outline:none; }
+  .save-btn { background:#2d6a4f;color:#fff;border:none;border-radius:5px;padding:5px 9px;cursor:pointer;font-size:13px; }
+  .cancel-btn { background:#c0392b;color:#fff;border:none;border-radius:5px;padding:5px 9px;cursor:pointer;font-size:13px; }
+  .btn-row { display:flex;gap:8px;margin-top:4px; }
+  .wa-btn { flex:2;display:flex;align-items:center;justify-content:center;gap:6px;background:#25D366;color:#fff;border-radius:10px;padding:11px 0;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;text-decoration:none;transition:opacity 0.15s; }
+  .wa-btn:hover { opacity:0.87; }
+  .lipa-btn { flex:2;display:flex;align-items:center;justify-content:center;gap:5px;background:#1a1a1a;color:#c8a96e;border-radius:10px;padding:11px 0;font-family:'DM Sans',sans-serif;font-weight:700;font-size:12px;text-decoration:none;border:1.5px solid #2d2d2d;transition:background 0.15s;letter-spacing:0.03em; }
+  .lipa-btn:hover { background:#2d2d2d; }
+  
+  footer { background:#1a1a1a;padding:32px 20px;text-align:center; }
+  .footer-logo { font-family:'Playfair Display',serif;font-size:19px;color:#c8a96e;margin-bottom:6px; }
+  .footer-sub { color:#666;font-size:12px; }
+
+  /* Modal */
+  .modal-bg { position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999;display:flex;align-items:center;justify-content:center; }
+  .modal { background:#fff;border-radius:18px;padding:36px 32px;box-shadow:0 20px 60px rgba(0,0,0,0.25);min-width:290px;max-width:340px;width:90%; }
+  .modal h3 { font-family:'Playfair Display',serif;font-size:22px;color:#1a1a1a;margin-bottom:6px; }
+  .modal p { color:#999;font-size:13px;margin-bottom:18px; }
+  .pin-input { width:100%;padding:13px;border:2px solid #e0dbd4;border-radius:10px;font-size:22px;letter-spacing:0.35em;text-align:center;font-family:monospace;outline:none;margin-bottom:8px;transition:border-color 0.2s; }
+  .pin-input:focus { border-color:#c8a96e; }
+  .pin-input.error { border-color:#e74c3c; }
+  .pin-error { color:#e74c3c;font-size:12px;margin-bottom:10px; }
+  .unlock-btn { width:100%;background:#1a1a1a;color:#c8a96e;border:none;border-radius:10px;padding:14px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:4px; }
+  .count { font-size:12px;color:#888; }
+  .empty { text-align:center;padding:80px 0;color:#bbb;font-family:'Playfair Display',serif;font-size:22px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-icon">👟</span>
+      <div>
+        <div class="logo-title">Kicks <span>&</span> Finds</div>
+        <div class="logo-sub">Pre-loved · Mombasa</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <span class="count" id="count-label">6 items</span>
+      <button class="admin-btn" id="admin-btn" onclick="toggleAdmin()">Admin</button>
+    </div>
+  </div>
+</header>
+
+<div class="hero-strip">
+  <p>✦ Fresh drops · Lipa Pole Pole available · DM to cop ✦</p>
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search-input" placeholder="Search shoes…" oninput="renderGrid()">
+  </div>
+  <div class="pills" id="pills"></div>
+</div>
+<div class="admin-notice" id="admin-notice" style="display:none">
+  <div class="admin-notice-inner">✏️ Admin mode — click the pencil on any price to edit it.</div>
+</div>
+
+<main><div class="grid" id="grid"></div><div id="empty" class="empty" style="display:none">No items found 👟</div></main>
+
+<footer>
+  <div class="footer-logo">Kicks <span style="color:#fff">&</span> Finds</div>
+  <div class="footer-sub">Pre-loved footwear · Mombasa, Kenya · DM to cop 👟</div>
+</footer>
+
+<!-- PIN MODAL -->
+<div class="modal-bg" id="modal" style="display:none" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>Admin Access</h3>
+    <p>Enter PIN to edit prices</p>
+    <input type="password" class="pin-input" id="pin-input" placeholder="••••" oninput="clearPinError()" onkeydown="if(event.key==='Enter')submitPin()">
+    <div class="pin-error" id="pin-error" style="display:none">Wrong PIN. Try again.</div>
+    <button class="unlock-btn" onclick="submitPin()">Unlock</button>
+  </div>
+</div>
+
+<script>
+const WHATSAPP = "254700000000";
+const PIN = "1234";
+let adminMode = false;
+let editingId = null;
+
+const PRODUCTS = [
+  {
+    id:1, name:"Birkenstock Amsterdam Wool Clogs", brand:"Birkenstock", price:4500,
+    category:"Clogs", condition:"Used – Good", available:true,
+    postedAt:"2026-04-16T08:00:00",
+    imgs:["https://images.unsplash.com/photo-1603487742131-4160ec999306?w=600&q=80"],
+    desc:"Dark grey wool felt Birkenstock Amsterdam clogs. Cork footbed with natural leather lining. Loved but still have life in them.",
+  },
+  {
+    id:2, name:"Nike Air Force 1 Triple Black", brand:"Nike", price:6500,
+    category:"Sneakers", condition:"Used – Very Good", available:true,
+    postedAt:"2026-04-16T07:30:00",
+    imgs:["https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80","https://images.unsplash.com/photo-1584735175315-9d5df23be2a2?w=600&q=80"],
+    desc:"All-black Nike Air Force 1 Low. Clean leather upper with shoe trees included. Minor creasing on toe box only.",
+  },
+  {
+    id:3, name:"Nike Court Legacy White Canvas", brand:"Nike", price:5800,
+    category:"Sneakers", condition:"Used – Good", available:true,
+    postedAt:"2026-04-15T19:00:00",
+    imgs:["https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=600&q=80","https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=620&q=80"],
+    desc:"White canvas Nike Court Legacy. Retro low-profile silhouette with gold script logo. Some canvas yellowing — adds character.",
+  },
+  {
+    id:4, name:"Black Patent Penny Loafers", brand:"Unbranded", price:3200,
+    category:"Loafers", condition:"Used – Good", available:false,
+    postedAt:"2026-04-15T14:00:00",
+    imgs:["https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=600&q=80"],
+    desc:"High-shine black patent leather penny loafers. Classic silhouette with moccasin stitching. Size-up if between sizes.",
+  },
+  {
+    id:5, name:"Chunky Horsebit Loafers", brand:"Unbranded", price:7500,
+    category:"Loafers", condition:"Used – Excellent", available:true,
+    postedAt:"2026-04-15T12:00:00",
+    imgs:["https://images.unsplash.com/photo-1617713964959-d9a36bbc7b52?w=600&q=80","https://images.unsplash.com/photo-1617713964959-d9a36bbc7b52?w=620&q=80"],
+    desc:"Black leather chunky lug-sole loafers with gold horsebit hardware. Very lightly worn. Perfect statement shoe.",
+  },
+  {
+    id:6, name:"Adidas Sabalo Red Suede", brand:"Adidas", price:5500,
+    category:"Sneakers", condition:"Used – Good", available:true,
+    postedAt:"2026-04-15T10:00:00",
+    imgs:["https://images.unsplash.com/photo-1578116922645-3976907a7671?w=600&q=80","https://images.unsplash.com/photo-1561861422-a549073e547a?w=600&q=80"],
+    desc:"Burnt red suede Adidas Sabalo with clean white cupsole. White trefoil logo. A rare colourway — seriously a head-turner.",
+  },
+];
+
+// Sort newest first
+PRODUCTS.sort((a,b)=>new Date(b.postedAt)-new Date(a.postedAt));
+
+const prices = {};
+PRODUCTS.forEach(p=>prices[p.id]=p.price);
+const liked = {};
+const imgIdx = {};
+
+function timeAgo(d){
+  const s=(Date.now()-new Date(d))/1000;
+  if(s<60)return'just now';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+function fmt(p){return'KES '+p.toLocaleString();}
+
+function getCategories(){
+  const cats=['All'];
+  PRODUCTS.forEach(p=>{if(!cats.includes(p.category))cats.push(p.category);});
+  return cats;
+}
+let activeFilter='All';
+
+function renderPills(){
+  const wrap=document.getElementById('pills');
+  wrap.innerHTML='';
+  getCategories().forEach(cat=>{
+    const b=document.createElement('button');
+    b.className='pill'+(cat===activeFilter?' active':'');
+    b.textContent=cat;
+    b.onclick=()=>{activeFilter=cat;renderPills();renderGrid();};
+    wrap.appendChild(b);
+  });
+}
+
+function renderGrid(){
+  const search=document.getElementById('search-input').value.toLowerCase();
+  const grid=document.getElementById('grid');
+  const empty=document.getElementById('empty');
+  
+  const filtered=PRODUCTS.filter(p=>{
+    const ms=p.name.toLowerCase().includes(search)||p.brand.toLowerCase().includes(search);
+    const mc=activeFilter==='All'||p.category===activeFilter;
+    return ms&&mc;
+  });
+
+  document.getElementById('count-label').textContent=filtered.length+' items';
+  grid.innerHTML='';
+
+  if(filtered.length===0){empty.style.display='block';return;}
+  empty.style.display='none';
+
+  filtered.forEach((p,i)=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.style.animationDelay=(i*0.07)+'s';
+    const idx=imgIdx[p.id]||0;
+    const price=prices[p.id];
+    const isLiked=liked[p.id];
+    
+    const waMsg=encodeURIComponent(`Hi! I'm interested in the *${p.name}* listed at *${fmt(price)}*. Is it still available? 👟`);
+    const lipaMsg=encodeURIComponent(`Hi! I'd like to book the *${p.name}* (${fmt(price)}) on Lipa Pole Pole. What's the deposit? 🙏`);
+
+    const dotsHtml=p.imgs.length>1?`<div class="dots">${p.imgs.map((_,di)=>`<button class="dot${di===idx?' active':''}" style="width:${di===idx?'16px':'5px'}" onclick="setImg(${p.id},${di})"></button>`).join('')}</div>`:'' ;
+
+    const priceHtml = adminMode
+      ? (editingId===p.id
+          ? `<div class="price-edit-row"><span style="font-family:monospace;color:#aaa;font-size:13px">KES</span><input type="number" class="price-input" id="price-inp-${p.id}" value="${price}" onkeydown="if(event.key==='Enter')savePrice(${p.id})"><button class="save-btn" onclick="savePrice(${p.id})">✓</button><button class="cancel-btn" onclick="cancelEdit()">✕</button></div>`
+          : `<div class="price-row"><span class="price">${fmt(price)}</span><button class="edit-price-btn" onclick="startEdit(${p.id})">✏️</button></div>`)
+      : `<div class="price-row"><span class="price">${fmt(price)}</span></div>`;
+
+    const buttonsHtml = p.available ? `
+      <div class="btn-row">
+        <a class="wa-btn" href="https://wa.me/${WHATSAPP}?text=${waMsg}" target="_blank">💬 Enquire</a>
+        <a class="lipa-btn" href="https://wa.me/${WHATSAPP}?text=${lipaMsg}" target="_blank">💳 Lipa Pole Pole</a>
+      </div>` : '';
+
+    card.innerHTML=`
+      <div class="img-wrap">
+        <img src="${p.imgs[idx]}" alt="${p.name}" loading="lazy">
+        ${!p.available?'<div class="sold-overlay"><div class="sold-badge">SOLD</div></div>':''}
+        <div class="cond-badge">${p.condition}</div>
+        <button class="like-btn" onclick="toggleLike(${p.id})" title="Save">${isLiked?'❤️':'🤍'}</button>
+        ${dotsHtml}
+        ${p.imgs.length>1?`<button onclick="prevImg(${p.id})" style="position:absolute;left:0;top:0;bottom:0;width:30%;background:none;border:none;cursor:pointer"></button><button onclick="nextImg(${p.id})" style="position:absolute;right:0;top:0;bottom:0;width:30%;background:none;border:none;cursor:pointer"></button>`:''}
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="brand">${p.brand}</span>
+          <span class="time-ago">🕐 ${timeAgo(p.postedAt)}</span>
+        </div>
+        <div class="card-name">${p.name}</div>
+        <div class="card-desc">${p.desc}</div>
+        <div class="avail ${p.available?'yes':'no'}">${p.available?'✅ Available':'❌ Sold'}</div>
+        ${priceHtml}
+        ${buttonsHtml}
+      </div>`;
+    grid.appendChild(card);
+    if(editingId===p.id){
+      setTimeout(()=>{const inp=document.getElementById('price-inp-'+p.id);if(inp)inp.focus();},50);
+    }
+  });
+}
+
+function setImg(id,i){imgIdx[id]=i;renderGrid();}
+function nextImg(id){
+  const p=PRODUCTS.find(x=>x.id===id);
+  imgIdx[id]=((imgIdx[id]||0)+1)%p.imgs.length;
+  renderGrid();
+}
+function prevImg(id){
+  const p=PRODUCTS.find(x=>x.id===id);
+  imgIdx[id]=((imgIdx[id]||0)-1+p.imgs.length)%p.imgs.length;
+  renderGrid();
+}
+function toggleLike(id){liked[id]=!liked[id];renderGrid();}
+
+function startEdit(id){editingId=id;renderGrid();}
+function cancelEdit(){editingId=null;renderGrid();}
+function savePrice(id){
+  const inp=document.getElementById('price-inp-'+id);
+  if(inp){prices[id]=parseInt(inp.value)||prices[id];}
+  editingId=null;renderGrid();
+}
+
+function toggleAdmin(){
+  if(adminMode){adminMode=false;editingId=null;document.getElementById('admin-btn').classList.remove('active');document.getElementById('admin-btn').textContent='Admin';document.getElementById('admin-notice').style.display='none';renderGrid();return;}
+  document.getElementById('modal').style.display='flex';
+  setTimeout(()=>document.getElementById('pin-input').focus(),100);
+}
+function closeModal(e){if(e.target===document.getElementById('modal')){document.getElementById('modal').style.display='none';document.getElementById('pin-input').value='';clearPinError();}}
+function clearPinError(){document.getElementById('pin-error').style.display='none';document.getElementById('pin-input').classList.remove('error');}
+function submitPin(){
+  const v=document.getElementById('pin-input').value;
+  if(v===PIN){
+    adminMode=true;
+    document.getElementById('modal').style.display='none';
+    document.getElementById('pin-input').value='';
+    document.getElementById('admin-btn').classList.add('active');
+    document.getElementById('admin-btn').textContent='✏️ Editing';
+    document.getElementById('admin-notice').style.display='block';
+    renderGrid();
+  } else {
+    document.getElementById('pin-error').style.display='block';
+    document.getElementById('pin-input').classList.add('error');
+  }
+}
+
+renderPills();
+renderGrid();
+</script>
+</body>
+</html>
