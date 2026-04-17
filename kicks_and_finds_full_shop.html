@@ -1,0 +1,572 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=DM+Sans:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gold:#c8a96e;--gold-light:#e0c48a;--dark:#1a1a1a;--dark2:#2d2420;
+  --green:#2d6a4f;--red:#c0392b;--bg:#f7f4f0;--card:#fff;
+  --border:#e8e4df;--text:#1a1a1a;--muted:#888;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+@keyframes slideIn{from{opacity:0;transform:translateX(100%);}to{opacity:1;transform:translateX(0);}}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
+
+/* ── HEADER ── */
+header{background:var(--dark);position:sticky;top:0;z-index:200;box-shadow:0 2px 24px rgba(0,0,0,0.28);}
+.hdr{max-width:1140px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:68px;}
+.logo-wrap{display:flex;align-items:center;gap:12px;cursor:pointer;}
+.logo-img{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);box-shadow:0 0 12px rgba(200,169,110,0.4);}
+.logo-text .name{font-family:'Playfair Display',serif;font-size:21px;font-weight:800;color:#fff;letter-spacing:-0.02em;}
+.logo-text .name em{color:var(--gold);font-style:normal;}
+.logo-text .sub{font-size:10px;color:#666;letter-spacing:0.16em;text-transform:uppercase;}
+.hdr-right{display:flex;align-items:center;gap:12px;}
+.count-badge{font-size:12px;color:#777;font-weight:600;}
+.admin-toggle{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;border:1.5px solid #444;background:transparent;color:#888;}
+.admin-toggle.on{background:var(--gold);color:var(--dark);border-color:var(--gold);}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,var(--dark) 0%,var(--dark2) 100%);padding:14px 20px;text-align:center;}
+.hero p{color:var(--gold);font-size:12px;letter-spacing:.2em;text-transform:uppercase;}
+
+/* ── CONTROLS ── */
+.controls{max-width:1140px;margin:0 auto;padding:22px 20px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+.search-wrap{flex:1;min-width:200px;position:relative;}
+.search-wrap input{width:100%;padding:11px 14px 11px 38px;border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;background:#fff;outline:none;transition:border-color .2s;}
+.search-wrap input:focus{border-color:var(--gold);}
+.search-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#bbb;pointer-events:none;}
+.pills{display:flex;gap:7px;flex-wrap:wrap;}
+.pill{padding:8px 16px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:12.5px;transition:all .18s;border:1.5px solid var(--border);background:#fff;color:#777;}
+.pill.on{background:var(--gold);color:var(--dark);border-color:var(--gold);}
+.admin-bar{max-width:1140px;margin:10px auto 0;padding:0 20px;}
+.admin-bar-inner{background:#fff8ec;border:1.5px dashed var(--gold);border-radius:10px;padding:10px 16px;font-size:13px;color:#9a6f28;font-weight:600;display:flex;justify-content:space-between;align-items:center;}
+.add-btn{background:var(--dark);color:var(--gold);border:none;border-radius:8px;padding:8px 18px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:background .15s;}
+.add-btn:hover{background:#2d2d2d;}
+
+/* ── GRID ── */
+main{max-width:1140px;margin:0 auto;padding:22px 20px 60px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(266px,1fr));gap:22px;}
+.empty{text-align:center;padding:80px 0;color:#bbb;font-family:'Playfair Display',serif;font-size:22px;}
+
+/* ── CARD ── */
+.card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.07);display:flex;flex-direction:column;transition:box-shadow .22s,transform .22s;animation:fadeUp .4s ease both;}
+.card:hover{box-shadow:0 10px 36px rgba(0,0,0,.13);transform:translateY(-3px);}
+.img-wrap{position:relative;width:100%;padding-bottom:125%;background:#f0ede8;overflow:hidden;}
+.img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .4s ease;}
+.card:hover .img-wrap img{transform:scale(1.04);}
+.img-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px;color:#ccc;}
+.sold-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);}
+.sold-tag{background:var(--red);color:#fff;font-weight:700;font-size:12px;letter-spacing:.15em;padding:5px 16px;text-transform:uppercase;border-radius:3px;}
+.cond-tag{position:absolute;top:11px;left:11px;background:rgba(255,255,255,.93);backdrop-filter:blur(4px);border-radius:20px;padding:3px 9px;font-size:11px;font-weight:600;color:#333;letter-spacing:.04em;}
+.like-btn{position:absolute;top:11px;right:11px;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);font-size:15px;transition:transform .15s;}
+.like-btn:hover{transform:scale(1.18);}
+.dots-row{position:absolute;bottom:9px;left:50%;transform:translateX(-50%);display:flex;gap:4px;}
+.dot{height:5px;border-radius:3px;background:rgba(255,255,255,.5);cursor:pointer;transition:all .18s;border:none;}
+.dot.on{background:#fff;}
+.card-body{padding:15px 17px 18px;flex:1;display:flex;flex-direction:column;gap:9px;}
+.card-meta{display:flex;justify-content:space-between;align-items:center;}
+.brand-lbl{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;}
+.time-lbl{font-size:11px;color:#bbb;}
+.card-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--dark);line-height:1.35;}
+.card-desc{font-size:12.5px;color:#888;line-height:1.6;}
+.avail-row{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;}
+.avail-yes{color:var(--green);}
+.avail-no{color:var(--red);}
+.price-lbl{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--dark);}
+.btn-row{display:flex;gap:8px;margin-top:4px;}
+.wa-btn{flex:2;display:flex;align-items:center;justify-content:center;gap:6px;background:#25D366;color:#fff;border-radius:10px;padding:11px 0;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;text-decoration:none;transition:opacity .15s;border:none;cursor:pointer;}
+.wa-btn:hover{opacity:.85;}
+.lipa-btn{flex:2;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--dark);color:var(--gold);border-radius:10px;padding:11px 0;font-family:'DM Sans',sans-serif;font-weight:700;font-size:12px;text-decoration:none;border:1.5px solid #2d2d2d;transition:background .15s;cursor:pointer;}
+.lipa-btn:hover{background:#2d2d2d;}
+.admin-card-btns{display:flex;gap:7px;margin-top:4px;}
+.edit-card-btn{flex:1;padding:9px;background:#f0ede8;border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:#555;transition:background .15s;}
+.edit-card-btn:hover{background:#e8e4df;}
+.del-card-btn{flex:1;padding:9px;background:#fff0f0;border:1.5px solid #f5c6c6;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--red);transition:background .15s;}
+.del-card-btn:hover{background:#ffe0e0;}
+
+/* ── DRAWER (Admin Panel) ── */
+.drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;align-items:flex-start;justify-content:flex-end;}
+.drawer-bg.show{display:flex;}
+.drawer{background:#fff;width:min(480px,100vw);height:100vh;overflow-y:auto;box-shadow:-8px 0 40px rgba(0,0,0,.2);animation:slideIn .3s ease;}
+.drawer-hdr{background:var(--dark);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.drawer-title{font-family:'Playfair Display',serif;font-size:18px;color:#fff;font-weight:700;}
+.drawer-close{background:none;border:none;color:#888;font-size:22px;cursor:pointer;line-height:1;}
+.drawer-close:hover{color:#fff;}
+.drawer-body{padding:24px;}
+
+/* ── FORM ── */
+.form-section{margin-bottom:28px;}
+.form-section-title{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.14em;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.form-row{margin-bottom:14px;}
+.form-row label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;}
+.form-row input,.form-row select,.form-row textarea{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;background:#fff;}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:var(--gold);}
+.form-row textarea{resize:vertical;min-height:80px;}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f7f4f0;border-radius:9px;margin-bottom:14px;}
+.toggle-row span{font-size:13px;font-weight:600;color:#444;}
+.toggle{appearance:none;width:44px;height:24px;background:#ccc;border-radius:12px;position:relative;cursor:pointer;transition:background .2s;outline:none;}
+.toggle:checked{background:var(--green);}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.toggle:checked::after{left:23px;}
+
+/* Image upload */
+.img-upload-zone{border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:10px;}
+.img-upload-zone:hover{border-color:var(--gold);}
+.img-upload-zone input{display:none;}
+.upload-label{font-size:13px;color:#aaa;cursor:pointer;}
+.upload-label strong{color:var(--gold);display:block;font-size:22px;margin-bottom:4px;}
+.img-previews{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.img-preview-item{position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1.5px solid var(--border);}
+.img-preview-item img{width:100%;height:100%;object-fit:cover;}
+.img-preview-item button{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+
+/* Category manager */
+.cat-list{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+.cat-chip{display:flex;align-items:center;gap:5px;padding:5px 12px;background:#f0ede8;border-radius:20px;font-size:12px;font-weight:600;color:#555;}
+.cat-chip button{background:none;border:none;color:#c0392b;cursor:pointer;font-size:13px;line-height:1;padding:0;}
+.cat-add-row{display:flex;gap:8px;}
+.cat-add-row input{flex:1;padding:9px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;}
+.cat-add-row input:focus{border-color:var(--gold);}
+.cat-add-btn{background:var(--dark);color:var(--gold);border:none;border-radius:9px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer;}
+
+/* Form actions */
+.form-actions{display:flex;gap:10px;margin-top:8px;padding-top:16px;border-top:1px solid var(--border);}
+.save-btn-main{flex:2;background:var(--dark);color:var(--gold);border:none;border-radius:10px;padding:13px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s;}
+.save-btn-main:hover{background:#2d2d2d;}
+.cancel-btn-main{flex:1;background:#f0ede8;color:#555;border:none;border-radius:10px;padding:13px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;}
+
+/* ── MODAL (PIN) ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;display:none;align-items:center;justify-content:center;}
+.modal-bg.show{display:flex;}
+.modal{background:#fff;border-radius:18px;padding:36px 32px;box-shadow:0 20px 60px rgba(0,0,0,.25);width:min(340px,92vw);}
+.modal h3{font-family:'Playfair Display',serif;font-size:22px;color:var(--dark);margin-bottom:6px;}
+.modal p{color:#999;font-size:13px;margin-bottom:18px;}
+.pin-inp{width:100%;padding:14px;border:2px solid var(--border);border-radius:10px;font-size:24px;letter-spacing:.35em;text-align:center;font-family:monospace;outline:none;margin-bottom:8px;transition:border-color .2s;}
+.pin-inp:focus{border-color:var(--gold);}
+.pin-inp.err{border-color:var(--red);}
+.pin-err{color:var(--red);font-size:12px;margin-bottom:10px;display:none;}
+.unlock-btn{width:100%;background:var(--dark);color:var(--gold);border:none;border-radius:10px;padding:14px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:4px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--dark);color:var(--gold);padding:12px 24px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+/* ── DELETE CONFIRM ── */
+.confirm-modal{background:#fff;border-radius:16px;padding:28px 26px;width:min(320px,90vw);}
+.confirm-modal h4{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:8px;}
+.confirm-modal p{font-size:13px;color:#888;margin-bottom:20px;}
+.confirm-btns{display:flex;gap:10px;}
+.confirm-del{flex:1;background:var(--red);color:#fff;border:none;border-radius:9px;padding:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.confirm-cancel{flex:1;background:#f0ede8;color:#555;border:none;border-radius:9px;padding:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+footer{background:var(--dark);padding:28px 20px;text-align:center;}
+.footer-logo{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);margin-bottom:6px;}
+.footer-sub{color:#555;font-size:12px;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+<div class="hdr">
+  <div class="logo-wrap">
+    <img class="logo-img" src="/mnt/user-data/outputs/logo.jpg" alt="Kicks & Finds" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='flex'">
+    <div id="logo-fallback" style="display:none;width:48px;height:48px;border-radius:50%;background:var(--dark2);border:2px solid var(--gold);align-items:center;justify-content:center;font-size:22px;">👟</div>
+    <div class="logo-text">
+      <div class="name">Kicks <em>&</em> Finds</div>
+      <div class="sub">Pre-loved · Mombasa</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="count-badge" id="count-lbl">6 items</span>
+    <button class="admin-toggle" id="admin-toggle" onclick="openPinModal()">Admin</button>
+  </div>
+</div>
+</header>
+
+<div class="hero"><p>✦ Fresh drops · Lipa Pole Pole available · DM to cop ✦</p></div>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-ico">🔍</span>
+    <input type="text" id="search" placeholder="Search shoes, bags…" oninput="renderGrid()">
+  </div>
+  <div class="pills" id="pills"></div>
+</div>
+<div class="admin-bar" id="admin-bar" style="display:none">
+  <div class="admin-bar-inner">
+    <span>✏️ Admin mode — edit any listing or add a new product below</span>
+    <button class="add-btn" onclick="openDrawer(null)">+ Add Product</button>
+  </div>
+</div>
+
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none">No items found 👟</div>
+</main>
+
+<footer>
+  <div class="footer-logo">Kicks <span style="color:#fff">&</span> Finds</div>
+  <div class="footer-sub">Pre-loved footwear & finds · Mombasa, Kenya · DM to cop 👟</div>
+</footer>
+
+<!-- PIN MODAL -->
+<div class="modal-bg" id="pin-modal" onclick="if(event.target===this)closePinModal()">
+  <div class="modal">
+    <h3>Admin Access</h3>
+    <p>Enter your PIN to manage products</p>
+    <input type="password" class="pin-inp" id="pin-inp" placeholder="••••" oninput="document.getElementById('pin-err').style.display='none';this.classList.remove('err')" onkeydown="if(event.key==='Enter')submitPin()">
+    <div class="pin-err" id="pin-err">Wrong PIN. Try again.</div>
+    <button class="unlock-btn" onclick="submitPin()">Unlock ✓</button>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-bg" id="del-modal" onclick="if(event.target===this)document.getElementById('del-modal').classList.remove('show')">
+  <div class="confirm-modal">
+    <h4>Delete Listing?</h4>
+    <p>This will permanently remove the product from your shop.</p>
+    <div class="confirm-btns">
+      <button class="confirm-del" onclick="confirmDelete()">Yes, Delete</button>
+      <button class="confirm-cancel" onclick="document.getElementById('del-modal').classList.remove('show')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT DRAWER -->
+<div class="drawer-bg" id="drawer-bg" onclick="if(event.target===this)closeDrawer()">
+  <div class="drawer">
+    <div class="drawer-hdr">
+      <span class="drawer-title" id="drawer-title">Add Product</span>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body">
+
+      <!-- Photos -->
+      <div class="form-section">
+        <div class="form-section-title">📸 Product Photos</div>
+        <div class="img-previews" id="img-previews"></div>
+        <div class="img-upload-zone" onclick="document.getElementById('photo-upload').click()">
+          <input type="file" id="photo-upload" accept="image/*" multiple onchange="handlePhotoUpload(event)">
+          <label class="upload-label"><strong>+</strong>Tap to upload photos<br><small style="color:#ccc">JPG, PNG — up to 10 images</small></label>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="form-section">
+        <div class="form-section-title">📋 Product Details</div>
+        <div class="form-row">
+          <label>Product Name *</label>
+          <input type="text" id="f-name" placeholder="e.g. Nike Air Force 1 Triple Black">
+        </div>
+        <div class="form-row-2">
+          <div class="form-row" style="margin-bottom:0">
+            <label>Brand *</label>
+            <input type="text" id="f-brand" placeholder="e.g. Nike">
+          </div>
+          <div class="form-row" style="margin-bottom:0">
+            <label>Category *</label>
+            <select id="f-category"></select>
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:14px">
+          <label>Description</label>
+          <textarea id="f-desc" placeholder="Describe the item, condition details, size notes…"></textarea>
+        </div>
+      </div>
+
+      <!-- Pricing & Status -->
+      <div class="form-section">
+        <div class="form-section-title">💰 Pricing & Status</div>
+        <div class="form-row-2">
+          <div class="form-row" style="margin-bottom:0">
+            <label>Price (KES) *</label>
+            <input type="number" id="f-price" placeholder="5000">
+          </div>
+          <div class="form-row" style="margin-bottom:0">
+            <label>Condition</label>
+            <select id="f-condition">
+              <option>Used – Excellent</option>
+              <option>Used – Very Good</option>
+              <option>Used – Good</option>
+              <option>Used – Fair</option>
+              <option>Brand New</option>
+            </select>
+          </div>
+        </div>
+        <div class="toggle-row" style="margin-top:14px">
+          <span>Available for sale</span>
+          <input type="checkbox" class="toggle" id="f-available" checked>
+        </div>
+      </div>
+
+      <!-- Categories Manager -->
+      <div class="form-section">
+        <div class="form-section-title">🗂️ Manage Categories</div>
+        <div class="cat-list" id="cat-list"></div>
+        <div class="cat-add-row">
+          <input type="text" id="new-cat-inp" placeholder="New category name…" onkeydown="if(event.key==='Enter')addCategory()">
+          <button class="cat-add-btn" onclick="addCategory()">Add</button>
+        </div>
+      </div>
+
+      <!-- WhatsApp -->
+      <div class="form-section">
+        <div class="form-section-title">📱 Contact</div>
+        <div class="form-row">
+          <label>WhatsApp Number (with country code)</label>
+          <input type="text" id="f-whatsapp" placeholder="254700000000" value="254700000000">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="cancel-btn-main" onclick="closeDrawer()">Cancel</button>
+        <button class="save-btn-main" onclick="saveProduct()">Save Product ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const PIN = "1234";
+let adminMode = false;
+let editingId = null;
+let deletingId = null;
+let imgIdx = {};
+let liked = {};
+let pendingPhotos = []; // base64 or URL
+let nextId = 7;
+
+let categories = ["Sneakers","Loafers","Clogs","Bags","Accessories"];
+
+let products = [
+  {id:1,name:"Birkenstock Amsterdam Wool Clogs",brand:"Birkenstock",price:4500,category:"Clogs",condition:"Used – Good",available:true,postedAt:"2026-04-16T08:00:00",imgs:["https://images.unsplash.com/photo-1603487742131-4160ec999306?w=600&q=80"],desc:"Dark grey wool felt Birkenstock Amsterdam clogs. Cork footbed with natural leather lining. Loved but still have life in them.",whatsapp:"254700000000"},
+  {id:2,name:"Nike Air Force 1 Triple Black",brand:"Nike",price:6500,category:"Sneakers",condition:"Used – Very Good",available:true,postedAt:"2026-04-16T07:30:00",imgs:["https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80"],desc:"All-black Nike Air Force 1 Low. Clean leather upper with shoe trees included. Minor creasing on toe box only.",whatsapp:"254700000000"},
+  {id:3,name:"Nike Court Legacy White Canvas",brand:"Nike",price:5800,category:"Sneakers",condition:"Used – Good",available:true,postedAt:"2026-04-15T19:00:00",imgs:["https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=600&q=80"],desc:"White canvas Nike Court Legacy. Retro low-profile silhouette with gold script logo.",whatsapp:"254700000000"},
+  {id:4,name:"Black Patent Penny Loafers",brand:"Unbranded",price:3200,category:"Loafers",condition:"Used – Good",available:false,postedAt:"2026-04-15T14:00:00",imgs:["https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=600&q=80"],desc:"High-shine black patent leather penny loafers. Classic silhouette with moccasin stitching.",whatsapp:"254700000000"},
+  {id:5,name:"Chunky Horsebit Loafers",brand:"Unbranded",price:7500,category:"Loafers",condition:"Used – Excellent",available:true,postedAt:"2026-04-15T12:00:00",imgs:["https://images.unsplash.com/photo-1617713964959-d9a36bbc7b52?w=600&q=80"],desc:"Black leather chunky lug-sole loafers with gold horsebit hardware. Very lightly worn.",whatsapp:"254700000000"},
+  {id:6,name:"Adidas Sabalo Red Suede",brand:"Adidas",price:5500,category:"Sneakers",condition:"Used – Good",available:true,postedAt:"2026-04-15T10:00:00",imgs:["https://images.unsplash.com/photo-1578116922645-3976907a7671?w=600&q=80"],desc:"Burnt red suede Adidas Sabalo with clean white cupsole. A rare colourway — seriously a head-turner.",whatsapp:"254700000000"},
+];
+
+products.sort((a,b)=>new Date(b.postedAt)-new Date(a.postedAt));
+
+function timeAgo(d){const s=(Date.now()-new Date(d))/1000;if(s<60)return'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+function fmt(p){return'KES '+Number(p).toLocaleString();}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+
+let activeFilter='All';
+
+function renderPills(){
+  const cats=['All',...categories];
+  const w=document.getElementById('pills');
+  w.innerHTML=cats.map(c=>`<button class="pill${c===activeFilter?' on':''}" onclick="setFilter('${c}')">${c}</button>`).join('');
+}
+function setFilter(c){activeFilter=c;renderPills();renderGrid();}
+
+function renderGrid(){
+  const s=document.getElementById('search').value.toLowerCase();
+  const filtered=products.filter(p=>{
+    const ms=p.name.toLowerCase().includes(s)||p.brand.toLowerCase().includes(s)||(p.desc||'').toLowerCase().includes(s);
+    const mc=activeFilter==='All'||p.category===activeFilter;
+    return ms&&mc;
+  });
+  document.getElementById('count-lbl').textContent=filtered.length+' item'+(filtered.length!==1?'s':'');
+  const grid=document.getElementById('grid');
+  const empty=document.getElementById('empty');
+  grid.innerHTML='';
+  if(!filtered.length){empty.style.display='block';return;}
+  empty.style.display='none';
+
+  filtered.forEach((p,i)=>{
+    const idx=imgIdx[p.id]||0;
+    const imgs=p.imgs&&p.imgs.length?p.imgs:[];
+    const isLiked=liked[p.id];
+    const waMsg=encodeURIComponent(`Hi! I'm interested in the *${p.name}* listed at *${fmt(p.price)}*. Is it still available? 👟`);
+    const lipaMsg=encodeURIComponent(`Hi! I'd like to book the *${p.name}* (${fmt(p.price)}) on Lipa Pole Pole. What's the deposit? 🙏`);
+    const waNum=p.whatsapp||'254700000000';
+
+    const imgHtml=imgs.length
+      ?`<img src="${imgs[idx]}" alt="${p.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=img-placeholder>👟</div>'">`
+      :`<div class="img-placeholder">👟</div>`;
+
+    const dotsHtml=imgs.length>1?`<div class="dots-row">${imgs.map((_,di)=>`<button class="dot${di===idx?' on':''}" style="width:${di===idx?15:5}px" onclick="setImg(${p.id},${di});event.stopPropagation()"></button>`).join('')}</div>`:'';
+
+    const navHtml=imgs.length>1?`
+      <button onclick="prevImg(${p.id})" style="position:absolute;left:0;top:0;bottom:0;width:30%;background:none;border:none;cursor:pointer"></button>
+      <button onclick="nextImg(${p.id})" style="position:absolute;right:0;top:0;bottom:0;width:30%;background:none;border:none;cursor:pointer"></button>`:'';
+
+    const adminBtns=adminMode?`
+      <div class="admin-card-btns">
+        <button class="edit-card-btn" onclick="openDrawer(${p.id})">✏️ Edit</button>
+        <button class="del-card-btn" onclick="askDelete(${p.id})">🗑️ Delete</button>
+      </div>`:'';
+
+    const publicBtns=p.available?`
+      <div class="btn-row">
+        <a class="wa-btn" href="https://wa.me/${waNum}?text=${waMsg}" target="_blank" rel="noopener">💬 Enquire</a>
+        <a class="lipa-btn" href="https://wa.me/${waNum}?text=${lipaMsg}" target="_blank" rel="noopener">💳 Lipa Pole Pole</a>
+      </div>`:'';
+
+    const card=document.createElement('div');
+    card.className='card';
+    card.style.animationDelay=(i*.07)+'s';
+    card.innerHTML=`
+      <div class="img-wrap">
+        ${imgHtml}
+        ${!p.available?'<div class="sold-ov"><div class="sold-tag">SOLD</div></div>':''}
+        <div class="cond-tag">${p.condition}</div>
+        <button class="like-btn" onclick="toggleLike(${p.id})">${isLiked?'❤️':'🤍'}</button>
+        ${dotsHtml}${navHtml}
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="brand-lbl">${p.brand}</span>
+          <span class="time-lbl">🕐 ${timeAgo(p.postedAt)}</span>
+        </div>
+        <div class="card-name">${p.name}</div>
+        <div class="card-desc">${p.desc||''}</div>
+        <div class="avail-row ${p.available?'avail-yes':'avail-no'}">${p.available?'✅ Available':'❌ Sold'}</div>
+        <div style="margin-top:2px"><span class="price-lbl">${fmt(p.price)}</span></div>
+        ${adminBtns}
+        ${!adminMode?publicBtns:''}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function setImg(id,i){imgIdx[id]=i;renderGrid();}
+function nextImg(id){const p=products.find(x=>x.id===id);if(!p||!p.imgs.length)return;imgIdx[id]=((imgIdx[id]||0)+1)%p.imgs.length;renderGrid();}
+function prevImg(id){const p=products.find(x=>x.id===id);if(!p||!p.imgs.length)return;imgIdx[id]=((imgIdx[id]||0)-1+p.imgs.length)%p.imgs.length;renderGrid();}
+function toggleLike(id){liked[id]=!liked[id];renderGrid();}
+
+// ── ADMIN AUTH ──
+function openPinModal(){if(adminMode){exitAdmin();return;}document.getElementById('pin-modal').classList.add('show');setTimeout(()=>document.getElementById('pin-inp').focus(),100);}
+function closePinModal(){document.getElementById('pin-modal').classList.remove('show');document.getElementById('pin-inp').value='';}
+function submitPin(){
+  if(document.getElementById('pin-inp').value===PIN){
+    adminMode=true;closePinModal();
+    document.getElementById('admin-toggle').textContent='✏️ Editing';
+    document.getElementById('admin-toggle').classList.add('on');
+    document.getElementById('admin-bar').style.display='block';
+    renderGrid();showToast('Admin mode enabled 🔓');
+  } else {
+    document.getElementById('pin-err').style.display='block';
+    document.getElementById('pin-inp').classList.add('err');
+  }
+}
+function exitAdmin(){adminMode=false;document.getElementById('admin-toggle').textContent='Admin';document.getElementById('admin-toggle').classList.remove('on');document.getElementById('admin-bar').style.display='none';renderGrid();showToast('Admin mode off');}
+
+// ── DRAWER ──
+function openDrawer(id){
+  editingId=id;
+  pendingPhotos=[];
+  const p=id?products.find(x=>x.id===id):null;
+  document.getElementById('drawer-title').textContent=id?'Edit Product':'Add Product';
+  document.getElementById('f-name').value=p?p.name:'';
+  document.getElementById('f-brand').value=p?p.brand:'';
+  document.getElementById('f-price').value=p?p.price:'';
+  document.getElementById('f-desc').value=p?p.desc||'':'';
+  document.getElementById('f-available').checked=p?p.available:true;
+  document.getElementById('f-whatsapp').value=p?p.whatsapp||'254700000000':'254700000000';
+  if(p&&p.imgs)pendingPhotos=[...p.imgs];
+  populateCategorySelect(p?p.category:'');
+  renderCatList();
+  renderPreviews();
+  document.getElementById('drawer-bg').classList.add('show');
+}
+function closeDrawer(){document.getElementById('drawer-bg').classList.remove('show');pendingPhotos=[];}
+
+function populateCategorySelect(current){
+  const sel=document.getElementById('f-category');
+  sel.innerHTML=categories.map(c=>`<option value="${c}" ${c===current?'selected':''}>${c}</option>`).join('');
+}
+
+function renderCatList(){
+  document.getElementById('cat-list').innerHTML=categories.map(c=>`
+    <div class="cat-chip">${c}<button onclick="removeCategory('${c}')" title="Remove">×</button></div>`).join('');
+  populateCategorySelect(document.getElementById('f-category')?.value||'');
+}
+
+function addCategory(){
+  const inp=document.getElementById('new-cat-inp');
+  const v=inp.value.trim();
+  if(!v||categories.includes(v))return;
+  categories.push(v);inp.value='';
+  renderCatList();renderPills();showToast('Category added: '+v);
+}
+function removeCategory(c){
+  categories=categories.filter(x=>x!==c);
+  renderCatList();renderPills();
+  if(activeFilter===c){activeFilter='All';renderGrid();}
+}
+
+// ── PHOTO UPLOAD ──
+function handlePhotoUpload(e){
+  const files=Array.from(e.target.files);
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      if(pendingPhotos.length<10){pendingPhotos.push(ev.target.result);renderPreviews();}
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+function renderPreviews(){
+  document.getElementById('img-previews').innerHTML=pendingPhotos.map((src,i)=>`
+    <div class="img-preview-item">
+      <img src="${src}" alt="photo ${i+1}">
+      <button onclick="removePhoto(${i})" title="Remove">×</button>
+    </div>`).join('');
+}
+function removePhoto(i){pendingPhotos.splice(i,1);renderPreviews();}
+
+// ── SAVE ──
+function saveProduct(){
+  const name=document.getElementById('f-name').value.trim();
+  const brand=document.getElementById('f-brand').value.trim();
+  const price=parseFloat(document.getElementById('f-price').value);
+  const category=document.getElementById('f-category').value;
+  const condition=document.getElementById('f-condition').value;
+  const desc=document.getElementById('f-desc').value.trim();
+  const available=document.getElementById('f-available').checked;
+  const whatsapp=document.getElementById('f-whatsapp').value.trim()||'254700000000';
+
+  if(!name||!brand||!price){showToast('⚠️ Name, Brand & Price are required');return;}
+
+  if(editingId){
+    const idx=products.findIndex(x=>x.id===editingId);
+    if(idx>-1){products[idx]={...products[idx],name,brand,price,category,condition,desc,available,whatsapp,imgs:pendingPhotos};}
+    showToast('Product updated ✓');
+  } else {
+    products.unshift({id:nextId++,name,brand,price,category,condition,desc,available,whatsapp,postedAt:new Date().toISOString(),imgs:pendingPhotos});
+    showToast('Product added ✓');
+  }
+  closeDrawer();renderGrid();renderPills();
+}
+
+// ── DELETE ──
+function askDelete(id){deletingId=id;document.getElementById('del-modal').classList.add('show');}
+function confirmDelete(){
+  products=products.filter(x=>x.id!==deletingId);
+  document.getElementById('del-modal').classList.remove('show');
+  renderGrid();showToast('Listing deleted');
+}
+
+// ── INIT ──
+renderPills();
+renderGrid();
+</script>
+</body>
+</html>
